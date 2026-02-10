@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="el">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Be My Valentine?</title>
+  <style>
+    :root {
+      --card-bg: rgba(255, 255, 255, 0.18);
+      --card-border: rgba(255, 255, 255, 0.35);
+      --text: #ffffff;
+      --shadow: rgba(0,0,0,0.25);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; }
+
+    /* Background */
+    body {
+      display: grid;
+      place-items: center;
+      color: var(--text);
+      overflow: hidden;
+      background: radial-gradient(circle at 20% 20%, #ff5fa2, transparent 50%),
+                  radial-gradient(circle at 80% 20%, #ffb3d9, transparent 45%),
+                  radial-gradient(circle at 50% 80%, #7c4dff, transparent 55%),
+                  linear-gradient(135deg, #ff2d55, #ff6ea8 40%, #7c4dff);
+      background-size: 120% 120%;
+      animation: bgMove 10s ease-in-out infinite alternate;
+    }
+
+    @keyframes bgMove {
+      from { background-position: 0% 0%, 100% 0%, 50% 100%, 0% 0%; }
+      to   { background-position: 10% 10%, 90% 15%, 55% 90%, 100% 100%; }
+    }
+
+    /* Floating hearts */
+    .hearts {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.25));
+    }
+    .heart {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      transform: rotate(45deg);
+      opacity: 0.75;
+      animation: floatUp linear infinite;
+      background: rgba(255,255,255,0.55);
+      border-radius: 4px;
+    }
+    .heart::before, .heart::after {
+      content: "";
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background: inherit;
+      border-radius: 50%;
+    }
+    .heart::before { left: -9px; top: 0; }
+    .heart::after  { left: 0; top: -9px; }
+
+    @keyframes floatUp {
+      from { transform: translateY(110vh) rotate(45deg) scale(var(--s)); }
+      to   { transform: translateY(-20vh) rotate(45deg) scale(var(--s)); }
+    }
+
+    /* Card */
+    .card {
+      position: relative;
+      width: min(520px, calc(100vw - 32px));
+      padding: 28px 22px;
+      border-radius: 22px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      box-shadow: 0 20px 60px var(--shadow);
+      backdrop-filter: blur(14px);
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(28px, 4vw, 40px);
+      letter-spacing: 0.2px;
+    }
+
+    p {
+      margin: 0 0 18px;
+      opacity: 0.92;
+      font-size: 16px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    button {
+      border: 0;
+      padding: 12px 18px;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.08s ease, filter 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+    }
+    button:active { transform: translateY(1px) scale(0.99); }
+
+    .yes {
+      background: linear-gradient(135deg, #00e5a8, #24ff72);
+      color: #063b2a;
+    }
+    .no {
+      background: linear-gradient(135deg, #ff3b6b, #ff7aa2);
+      color: #3b0616;
+    }
+
+    .message {
+      margin-top: 16px;
+      padding: 14px 14px;
+      border-radius: 16px;
+      background: rgba(0,0,0,0.18);
+      border: 1px solid rgba(255,255,255,0.22);
+      min-height: 52px;
+      display: grid;
+      place-items: center;
+      line-height: 1.3;
+      font-size: 16px;
+    }
+
+    .shake {
+      animation: shake 0.45s ease;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-6px); }
+      80% { transform: translateX(6px); }
+    }
+
+    .tiny {
+      margin-top: 10px;
+      opacity: 0.8;
+      font-size: 12px;
+    }
+
+    /* ---- NEW: intro -> question steps ---- */
+    .step { display: none; opacity: 0; transform: translateY(6px); transition: 280ms ease; }
+    .step.show { display: block; opacity: 1; transform: translateY(0); }
+
+    /* Paper note style */
+    .paper-note{
+      display: inline-block;
+      margin: 10px 0 18px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.85);
+      color: #2b1b24;
+      font-style: italic;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+      opacity: 1; /* override p opacity */
+    }
+  </style>
+</head>
+<body>
+  <div class="hearts" id="hearts"></div>
+
+  <main class="card" id="card">
+    <!-- STEP 1: Intro -->
+    <section id="stepIntro" class="step show">
+      <h1>💌</h1>
+      <p class="paper-note">Έχω μια πολύ σημαντική ερώτηση…</p>
+
+      <div class="buttons">
+        <button class="yes" id="continueBtn">Πες μου 🥺</button>
+      </div>
+
+      <div class="tiny">πάτα το κουμπί…</div>
+    </section>
+
+    <!-- STEP 2: Question -->
+    <section id="stepQuestion" class="step">
+      <h1>Θα γίνεις η Βαλεντίνα μου? 💘</h1>
+      <p>Διάλεξε σωστά 😇</p>
+
+      <div class="buttons">
+        <button class="yes" id="yesBtn">Ναι 💖</button>
+        <button class="no" id="noBtn">Όχι 🙈</button>
+      </div>
+
+      <div class="message" id="msg">Πάτα ένα κουμπί 👉👈</div>
+      <div class="tiny">Tip: edit the messages in the JS at the bottom.</div>
+    </section>
+  </main>
+
+  <script>
+    // --- Messages (edit these!) ---
+    const YES_MESSAGE = "Γιουπι!! 💖🥰 Η καλύτερη Βαλεντίνα του κόσμου! Τώρα θα σε φάω 😈";
+    const NO_MESSAGE  = "Θα σου φάω τ’ αυτιά που τόλμησες να πατήσεις όχι. Προσπάθησε πάλι! 😭💔 Αλλά ακόμα σ’ αγαπώ.";
+
+    // Steps
+    const stepIntro = document.getElementById("stepIntro");
+    const stepQuestion = document.getElementById("stepQuestion");
+    const continueBtn = document.getElementById("continueBtn");
+
+    function goToQuestion() {
+      stepIntro.classList.remove("show");
+      setTimeout(() => { stepIntro.style.display = "none"; }, 280);
+
+      stepQuestion.style.display = "block";
+      requestAnimationFrame(() => stepQuestion.classList.add("show"));
+    }
+
+    continueBtn.addEventListener("click", goToQuestion);
+
+    const msg = document.getElementById("msg");
+    const card = document.getElementById("card");
+
+    document.getElementById("yesBtn").addEventListener("click", () => {
+      msg.textContent = YES_MESSAGE;
+      msg.style.background = "rgba(0, 0, 0, 0.18)";
+      card.classList.remove("shake");
+      burstHearts(18);
+    });
+
+    document.getElementById("noBtn").addEventListener("click", () => {
+      msg.textContent = NO_MESSAGE;
+      card.classList.remove("shake");
+      void card.offsetWidth; // restart animation
+      card.classList.add("shake");
+      burstHearts(6);
+    });
+
+    // --- Background hearts ---
+    const heartsWrap = document.getElementById("hearts");
+
+    function spawnHeart() {
+      const h = document.createElement("div");
+      h.className = "heart";
+
+      const left = Math.random() * 100;
+      const dur = 6 + Math.random() * 8;
+      const size = 0.6 + Math.random() * 1.6;
+      const opacity = 0.35 + Math.random() * 0.45;
+
+      h.style.left = left + "vw";
+      h.style.animationDuration = dur + "s";
+      h.style.setProperty("--s", size.toFixed(2));
+      h.style.opacity = opacity.toFixed(2);
+
+      // slightly different tints
+      const tints = [
+        "rgba(255,255,255,0.60)",
+        "rgba(255,220,235,0.65)",
+        "rgba(255,200,220,0.60)"
+      ];
+      h.style.background = tints[Math.floor(Math.random() * tints.length)];
+
+      heartsWrap.appendChild(h);
+
+      setTimeout(() => h.remove(), dur * 1000);
+    }
+
+    // steady stream
+    setInterval(spawnHeart, 350);
+    for (let i = 0; i < 10; i++) setTimeout(spawnHeart, i * 200);
+
+    // burst when clicking buttons
+    function burstHearts(n) {
+      for (let i = 0; i < n; i++) setTimeout(spawnHeart, i * 40);
+    }
+  </script>
+</body>
+</html>
